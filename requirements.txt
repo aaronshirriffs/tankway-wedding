@@ -1,0 +1,8 @@
+flask
+gunicorn
+python-dotenv
+cloudinary
+apscheduler
+pytz
+Pillow
+fpdf2

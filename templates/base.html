@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Tony &amp; Kate{% endblock %}</title>
+  <meta name="description" content="A growing memory book for Tony & Kate — married 20 August 2026 in Fiji.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}">Tony <span>&amp;</span> Kate</a>
+    <nav class="site-nav">
+      <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' }}">Home</a>
+      <a href="{{ url_for('photos') }}" class="{{ 'active' if request.endpoint == 'photos' }}">Photos</a>
+      <a href="{{ url_for('wishes') }}" class="{{ 'active' if request.endpoint == 'wishes' }}">Wishes</a>
+    </nav>
+  </header>
+
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <p>Tony &amp; Kate · 20 August 2026 · Fiji</p>
+    <p class="footer-soft">Made with love by everyone who knows them.</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

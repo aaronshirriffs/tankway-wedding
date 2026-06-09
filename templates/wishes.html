@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Wishes · Tony &amp; Kate{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>Well Wishes</h1>
+  <p class="page-sub">Leave a note for Tony &amp; Kate — they'll read every one.</p>
+</section>
+
+<section class="upload-panel">
+  <form id="wish-form" class="form">
+    <label class="field">
+      <span>Your name</span>
+      <input type="text" name="name" maxlength="80" required>
+    </label>
+    <label class="field">
+      <span>Your message</span>
+      <textarea name="message" rows="4" maxlength="1000" required
+        placeholder="Wishing you both a lifetime of happiness…"></textarea>
+    </label>
+    <button type="submit" class="btn">Add my wish</button>
+    <div class="form-msg" id="wish-msg" hidden></div>
+  </form>
+</section>
+
+<section class="wish-wall" id="wish-wall">
+  {% if wishes %}
+    {% for w in wishes %}
+    <article class="wish-card fade-in">
+      <p class="wish-text">{{ w['message'] }}</p>
+      <div class="wish-meta">
+        <span class="wish-name">{{ w['name'] }}</span>
+        <span class="wish-time">{{ w['submitted_at'] | timeago }}</span>
+      </div>
+    </article>
+    {% endfor %}
+  {% else %}
+    <p class="empty" id="wish-empty">No wishes yet — yours could be the first.</p>
+  {% endif %}
+</section>
+{% endblock %}

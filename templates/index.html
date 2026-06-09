@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Tony &amp; Kate · 20 August 2026 · Fiji{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">together with their families</p>
+    <h1 class="hero-names">Tony <span>&amp;</span> Kate</h1>
+    <p class="hero-date">20 August 2026 <span class="dot">·</span> Fiji</p>
+
+    <div class="countdown" id="countdown" data-wedding="{{ wedding_date }}">
+      <div class="cd-unit"><span class="cd-num" data-unit="days">—</span><span class="cd-label">days</span></div>
+      <div class="cd-unit"><span class="cd-num" data-unit="hours">—</span><span class="cd-label">hours</span></div>
+      <div class="cd-unit"><span class="cd-num" data-unit="minutes">—</span><span class="cd-label">minutes</span></div>
+      <div class="cd-unit"><span class="cd-num" data-unit="seconds">—</span><span class="cd-label">seconds</span></div>
+    </div>
+    <p class="countdown-married" id="countdown-married" hidden></p>
+    <div class="countdown-festive" id="countdown-festive" hidden></div>
+  </div>
+  <div class="hero-wave" aria-hidden="true"></div>
+</section>
+
+<section class="cards cards-two">
+  <a class="nav-card" href="{{ url_for('photos') }}">
+    <span class="card-icon">❀</span>
+    <h2>Photos</h2>
+    <p>Share a favourite memory with Tony &amp; Kate.</p>
+    <span class="card-go">Open the album →</span>
+  </a>
+  <a class="nav-card" href="{{ url_for('wishes') }}">
+    <span class="card-icon">✎</span>
+    <h2>Wishes</h2>
+    <p>Leave a note for the happy couple to keep forever.</p>
+    <span class="card-go">Write a wish →</span>
+  </a>
+</section>
+
+<section class="keepsake-note">
+  <p>
+    Every photo and wish shared here will be gathered into a beautiful
+    keepsake e-book and sent to Tony &amp; Kate about a month after the wedding —
+    so there's time for every last memory to find its way in.
+  </p>
+</section>
+
+<section class="live-count">
+  <p>
+    <strong>{{ counts.photos }}</strong> photo{{ '' if counts.photos == 1 else 's' }} shared
+    <span class="sep">·</span>
+    <strong>{{ counts.wishes }}</strong> wish{{ '' if counts.wishes == 1 else 'es' }} left
+  </p>
+</section>
+{% endblock %}

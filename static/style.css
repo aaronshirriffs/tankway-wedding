@@ -1,0 +1,378 @@
+/* ===========================================================================
+   Tony & Kate — destination wedding aesthetic
+   Warm sandy / ivory tones with soft teal & aqua ocean accents.
+   =========================================================================== */
+:root {
+  --ivory:      #f7efe3;
+  --sand:       #efe3d2;
+  --sand-deep:  #e7dccb;
+  --cream:      #fffaf3;
+  --ink:        #4a4034;
+  --ink-soft:   #8a7d68;
+  --teal:       #2f7e7a;
+  --teal-deep:  #245f5c;
+  --aqua:       #7fc6c0;
+  --aqua-soft:  #d8efec;
+  --gold:       #c9a86a;
+  --shadow:     0 14px 40px rgba(74, 64, 52, 0.10);
+  --shadow-sm:  0 6px 18px rgba(74, 64, 52, 0.08);
+  --radius:     18px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--ivory);
+  background-image:
+    radial-gradient(1100px 520px at 50% -160px, var(--aqua-soft) 0%, transparent 70%),
+    linear-gradient(180deg, var(--ivory) 0%, var(--sand) 100%);
+  background-attachment: fixed;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500; letter-spacing: .01em; }
+
+a { color: var(--teal-deep); text-decoration: none; }
+
+/* --- Header --------------------------------------------------------------- */
+.site-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  padding: 22px clamp(18px, 5vw, 56px);
+  max-width: 1180px; margin: 0 auto;
+}
+.brand {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.7rem; font-weight: 600; color: var(--ink);
+  letter-spacing: .02em;
+}
+.brand span { color: var(--gold); font-style: italic; padding: 0 2px; }
+.site-nav { display: flex; gap: clamp(14px, 3vw, 30px); }
+.site-nav a {
+  position: relative; color: var(--ink-soft); font-size: .82rem;
+  text-transform: uppercase; letter-spacing: .16em; font-weight: 500;
+  padding: 4px 0; transition: color .25s;
+}
+.site-nav a:hover, .site-nav a.active { color: var(--teal); }
+.site-nav a.active::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -2px;
+  height: 2px; background: var(--aqua); border-radius: 2px;
+}
+
+.site-main { max-width: 1180px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 56px) 40px; }
+
+/* --- Hero ----------------------------------------------------------------- */
+.hero {
+  position: relative; text-align: center;
+  padding: clamp(40px, 9vw, 96px) 16px clamp(70px, 11vw, 120px);
+  margin-bottom: 56px;
+}
+.hero-eyebrow {
+  text-transform: uppercase; letter-spacing: .34em; font-size: .72rem;
+  color: var(--ink-soft); margin: 0 0 18px;
+}
+.hero-names {
+  font-size: clamp(3.4rem, 12vw, 7rem); line-height: .95; margin: 0;
+  color: var(--ink); font-weight: 500;
+}
+.hero-names span { color: var(--gold); font-style: italic; font-weight: 400; }
+.hero-date {
+  font-family: "Cormorant Garamond", serif; font-size: clamp(1.2rem, 3.4vw, 1.7rem);
+  letter-spacing: .12em; color: var(--teal); margin: 14px 0 0; text-transform: uppercase;
+}
+.hero-date .dot { color: var(--aqua); padding: 0 8px; }
+
+.hero-wave {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
+  background:
+    radial-gradient(60px 40px at 20% 0, transparent 60%, var(--aqua-soft) 61%),
+    radial-gradient(60px 40px at 60% 0, transparent 60%, var(--aqua-soft) 61%),
+    radial-gradient(60px 40px at 100% 0, transparent 60%, var(--aqua-soft) 61%);
+  opacity: .5; pointer-events: none;
+}
+
+/* --- Countdown ------------------------------------------------------------ */
+.countdown {
+  display: inline-flex; gap: clamp(10px, 3vw, 26px);
+  margin: 38px auto 0; padding: 22px clamp(18px, 4vw, 38px);
+  background: rgba(255, 250, 243, .72);
+  border: 1px solid var(--sand-deep); border-radius: var(--radius);
+  box-shadow: var(--shadow); backdrop-filter: blur(4px);
+}
+.cd-unit { display: flex; flex-direction: column; align-items: center; min-width: 58px; }
+.cd-num {
+  font-family: "Cormorant Garamond", serif; font-size: clamp(2rem, 6vw, 3.1rem);
+  font-weight: 600; color: var(--teal-deep); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.cd-label {
+  text-transform: uppercase; letter-spacing: .18em; font-size: .64rem;
+  color: var(--ink-soft); margin-top: 8px;
+}
+.countdown-married {
+  margin: 38px auto 0; font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.5rem, 5vw, 2.4rem); color: var(--teal-deep);
+}
+.countdown-married strong { color: var(--gold); font-weight: 600; }
+
+/* Festive splash shown on the wedding date itself */
+.countdown-festive { margin: 34px auto 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.festive-burst { font-size: clamp(1.8rem, 6vw, 2.8rem); letter-spacing: .3em; animation: festive-pop 1.6s ease-in-out infinite; }
+.festive-headline {
+  font-family: "Cormorant Garamond", serif; font-weight: 600;
+  font-size: clamp(2.4rem, 8vw, 4rem); line-height: 1.05;
+  background: linear-gradient(90deg, var(--gold), var(--teal), var(--gold));
+  background-size: 200% auto; -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: var(--gold);
+  animation: festive-shimmer 4s linear infinite;
+}
+.festive-sub {
+  font-family: "Cormorant Garamond", serif; font-style: italic;
+  font-size: clamp(1.1rem, 3.4vw, 1.6rem); color: var(--teal-deep);
+}
+@keyframes festive-pop { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+@keyframes festive-shimmer { to { background-position: 200% center; } }
+@media (prefers-reduced-motion: reduce) {
+  .festive-burst, .festive-headline { animation: none; }
+}
+
+/* --- Nav cards ------------------------------------------------------------ */
+.cards {
+  display: grid; gap: 22px; margin: 0 auto 48px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.nav-card {
+  display: flex; flex-direction: column; align-items: flex-start;
+  background: var(--cream); border: 1px solid var(--sand-deep);
+  border-radius: var(--radius); padding: 32px 30px; color: var(--ink);
+  box-shadow: var(--shadow-sm); transition: transform .3s, box-shadow .3s;
+}
+.nav-card:hover { transform: translateY(-6px); box-shadow: var(--shadow); }
+.card-icon {
+  font-size: 1.5rem; color: var(--aqua); margin-bottom: 10px;
+  width: 52px; height: 52px; display: grid; place-items: center;
+  background: var(--aqua-soft); border-radius: 50%;
+}
+.nav-card h2 { font-size: 1.9rem; margin: 6px 0 8px; }
+.nav-card p { margin: 0 0 18px; color: var(--ink-soft); font-size: .95rem; }
+.card-go { margin-top: auto; color: var(--teal); font-weight: 500; font-size: .9rem; letter-spacing: .02em; }
+
+.cards-two { max-width: 760px; margin-left: auto; margin-right: auto; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+/* --- Keepsake note on home ------------------------------------------------ */
+.keepsake-note { text-align: center; max-width: 640px; margin: 0 auto 40px; }
+.keepsake-note p {
+  font-family: "Cormorant Garamond", serif; font-size: 1.35rem; line-height: 1.5;
+  color: var(--teal-deep); margin: 0; font-style: italic;
+}
+
+/* --- Live count ----------------------------------------------------------- */
+.live-count { text-align: center; margin: 8px 0 12px; }
+.live-count p {
+  display: inline-block; padding: 14px 26px; font-size: .98rem; color: var(--ink-soft);
+  background: rgba(255, 250, 243, .6); border: 1px solid var(--sand-deep);
+  border-radius: 999px;
+}
+.live-count strong { color: var(--teal-deep); font-weight: 600; }
+.live-count .sep { color: var(--aqua); padding: 0 10px; }
+
+/* --- Page heads ----------------------------------------------------------- */
+.page-head { text-align: center; padding: 18px 0 30px; }
+.page-head h1 { font-size: clamp(2.6rem, 7vw, 4rem); margin: 0 0 8px; }
+.page-sub { color: var(--ink-soft); max-width: 600px; margin: 0 auto; font-size: 1.02rem; }
+
+/* --- Forms ---------------------------------------------------------------- */
+.upload-panel { max-width: 680px; margin: 0 auto 50px; }
+.form {
+  background: var(--cream); border: 1px solid var(--sand-deep);
+  border-radius: var(--radius); padding: clamp(22px, 4vw, 36px);
+  box-shadow: var(--shadow-sm);
+}
+.field-row { display: grid; gap: 18px; grid-template-columns: 1fr 1fr; }
+.field { display: flex; flex-direction: column; margin-bottom: 18px; }
+.field > span, .field legend {
+  font-size: .78rem; text-transform: uppercase; letter-spacing: .12em;
+  color: var(--ink-soft); margin-bottom: 8px; font-weight: 500;
+}
+.field em { text-transform: none; letter-spacing: 0; color: var(--aqua); font-style: normal; }
+.field input, .field textarea {
+  font-family: inherit; font-size: 1rem; color: var(--ink);
+  padding: 12px 14px; border: 1px solid var(--sand-deep); border-radius: 12px;
+  background: #fff; transition: border-color .2s, box-shadow .2s;
+}
+.field input:focus, .field textarea:focus {
+  outline: none; border-color: var(--aqua);
+  box-shadow: 0 0 0 4px var(--aqua-soft);
+}
+.file-field input { padding: 9px; background: #fff; }
+textarea { resize: vertical; }
+
+.unlock-field { border: none; padding: 0; margin: 0 0 18px; }
+.radio-row { display: grid; gap: 12px; grid-template-columns: repeat(3, 1fr); }
+.radio {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 14px 8px; border: 1px solid var(--sand-deep); border-radius: 12px;
+  cursor: pointer; transition: border-color .2s, background .2s;
+}
+.radio input { margin-bottom: 8px; accent-color: var(--teal); }
+.radio span { font-weight: 500; color: var(--ink); }
+.radio small { color: var(--ink-soft); font-size: .74rem; margin-top: 2px; }
+.radio:has(input:checked) { border-color: var(--teal); background: var(--aqua-soft); }
+
+.btn {
+  display: inline-block; cursor: pointer; font-family: inherit;
+  font-size: .9rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 600;
+  color: #fff; background: var(--teal); border: none;
+  padding: 14px 34px; border-radius: 999px; box-shadow: var(--shadow-sm);
+  transition: background .25s, transform .15s;
+}
+.btn:hover { background: var(--teal-deep); transform: translateY(-2px); }
+.btn:disabled { opacity: .6; cursor: progress; transform: none; }
+
+.form-note { font-size: .82rem; color: var(--ink-soft); margin: 14px 0 0; }
+.form-msg {
+  margin-top: 16px; padding: 14px 18px; border-radius: 12px; font-size: .95rem;
+}
+.form-msg.ok    { background: var(--aqua-soft); color: var(--teal-deep); border: 1px solid var(--aqua); }
+.form-msg.error { background: #fbeee6; color: #a4572e; border: 1px solid #e7c2ab; }
+
+/* --- Masonry photo grid --------------------------------------------------- */
+.masonry { columns: 3 240px; column-gap: 18px; margin-top: 10px; }
+.masonry-item {
+  break-inside: avoid; margin: 0 0 18px; background: var(--cream);
+  border: 1px solid var(--sand-deep); border-radius: 14px; overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.masonry-item img { width: 100%; display: block; }
+.masonry-item figcaption { padding: 12px 16px 2px; font-size: .95rem; color: var(--ink); }
+.masonry-item .by { display: block; padding: 4px 16px 14px; color: var(--ink-soft); font-size: .8rem; }
+
+/* --- Wishes wall ---------------------------------------------------------- */
+.wish-wall { columns: 2 320px; column-gap: 20px; }
+.wish-card {
+  break-inside: avoid; margin: 0 0 20px; background: var(--cream);
+  border: 1px solid var(--sand-deep); border-left: 3px solid var(--aqua);
+  border-radius: 14px; padding: 22px 24px; box-shadow: var(--shadow-sm);
+}
+.wish-text { font-family: "Cormorant Garamond", serif; font-size: 1.32rem; line-height: 1.5; margin: 0 0 14px; color: var(--ink); }
+.wish-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.wish-name { font-weight: 600; color: var(--teal-deep); font-size: .92rem; }
+.wish-time { color: var(--ink-soft); font-size: .78rem; }
+
+/* --- Vault count ---------------------------------------------------------- */
+.vault-count { text-align: center; margin: 0 auto 36px; }
+.vault-num {
+  display: block; font-family: "Cormorant Garamond", serif; font-weight: 600;
+  font-size: clamp(3rem, 10vw, 5rem); color: var(--teal-deep); line-height: 1;
+}
+.vault-label { color: var(--ink-soft); letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
+
+.empty { text-align: center; color: var(--ink-soft); padding: 40px 0; font-style: italic; grid-column: 1 / -1; }
+
+/* --- Fade-in -------------------------------------------------------------- */
+.fade-in { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+.fade-in.visible { opacity: 1; transform: none; }
+
+/* --- Footer --------------------------------------------------------------- */
+.site-footer {
+  text-align: center; padding: 40px 20px 50px; color: var(--ink-soft);
+  border-top: 1px solid var(--sand-deep); margin-top: 30px;
+}
+.site-footer p { margin: 4px 0; letter-spacing: .08em; }
+.footer-soft { font-size: .82rem; opacity: .8; }
+
+/* --- Admin ---------------------------------------------------------------- */
+.admin-body { background: var(--sand); }
+.admin-header {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+  max-width: 1100px; margin: 0 auto; padding: 26px clamp(18px, 4vw, 40px) 10px;
+}
+.admin-header h1 { margin: 0; font-size: 1.9rem; }
+.admin-back { font-size: .85rem; color: var(--teal); }
+.admin-tabs {
+  display: flex; gap: 8px; max-width: 1100px; margin: 0 auto;
+  padding: 0 clamp(18px, 4vw, 40px); border-bottom: 1px solid var(--sand-deep);
+}
+.admin-tabs .tab {
+  font-family: inherit; font-size: .88rem; font-weight: 500; cursor: pointer;
+  background: none; border: none; color: var(--ink-soft);
+  padding: 14px 18px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.admin-tabs .tab.active { color: var(--teal-deep); border-bottom-color: var(--teal); }
+.badge {
+  display: none; min-width: 20px; padding: 1px 7px; margin-left: 6px;
+  background: var(--teal); color: #fff; border-radius: 999px; font-size: .72rem; font-weight: 600;
+}
+.badge.show { display: inline-block; }
+
+.admin-main { max-width: 1100px; margin: 0 auto; padding: 26px clamp(18px, 4vw, 40px) 60px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+.panel-hint { color: var(--ink-soft); margin: 0 0 22px; font-size: .92rem; }
+.admin-subhead { font-size: 1.5rem; margin: 0 0 4px; color: var(--ink); }
+.admin-subhead.with-rule { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--sand-deep); }
+
+.admin-grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+.admin-card {
+  background: var(--cream); border: 1px solid var(--sand-deep); border-radius: 14px;
+  overflow: hidden; box-shadow: var(--shadow-sm); display: flex; flex-direction: column;
+}
+.admin-card img { width: 100%; height: 180px; object-fit: cover; display: block; }
+.admin-card .meta { padding: 12px 14px; flex: 1; }
+.admin-card .meta b { display: block; color: var(--ink); font-weight: 600; }
+.admin-card .meta small { color: var(--ink-soft); }
+.admin-card .actions { display: flex; gap: 8px; padding: 0 14px 14px; }
+
+/* --- Keepsake admin panel ------------------------------------------------- */
+.ebook-status {
+  background: var(--cream); border: 1px solid var(--sand-deep); border-radius: 14px;
+  padding: 20px 24px; margin: 0 0 22px; color: var(--ink); box-shadow: var(--shadow-sm);
+}
+.ebook-status p { margin: 0 0 8px; }
+.ebook-status p:last-child { margin-bottom: 0; }
+.ebook-warn { color: #a4572e; font-size: .9rem; margin-top: 10px !important; }
+.ebook-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+.btn-soft { background: #fff; color: var(--teal-deep); border: 1px solid var(--sand-deep); }
+.btn-soft:hover { background: var(--aqua-soft); }
+.btn-soft:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.admin-list { display: flex; flex-direction: column; gap: 14px; }
+.admin-row {
+  background: var(--cream); border: 1px solid var(--sand-deep); border-radius: 12px;
+  padding: 16px 18px; display: flex; justify-content: space-between; gap: 16px; align-items: flex-start;
+}
+.admin-row .row-body { flex: 1; }
+.admin-row .row-body p { margin: 0 0 8px; color: var(--ink); }
+.admin-row .row-body small { color: var(--ink-soft); }
+.tag {
+  display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .72rem;
+  background: var(--aqua-soft); color: var(--teal-deep); margin-right: 8px; font-weight: 600;
+}
+.tag.delivered { background: #e6f0e2; color: #4d7a45; }
+.row-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+.mini {
+  font-family: inherit; font-size: .76rem; font-weight: 600; letter-spacing: .04em;
+  cursor: pointer; padding: 7px 14px; border-radius: 999px; border: 1px solid transparent;
+}
+.mini.approve  { background: var(--teal); color: #fff; }
+.mini.approve:hover { background: var(--teal-deep); }
+.mini.neutral  { background: #fff; color: var(--teal-deep); border-color: var(--sand-deep); }
+.mini.neutral:hover { border-color: var(--aqua); }
+.mini.danger   { background: #fff; color: #b1502a; border-color: #e7c2ab; }
+.mini.danger:hover { background: #fbeee6; }
+
+/* --- Responsive ----------------------------------------------------------- */
+@media (max-width: 620px) {
+  .field-row { grid-template-columns: 1fr; }
+  .radio-row { grid-template-columns: 1fr; }
+  .masonry { columns: 2 150px; }
+  .wish-wall { columns: 1; }
+  .site-header { justify-content: center; text-align: center; }
+}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Photos · Tony &amp; Kate{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>The Album</h1>
+  <p class="page-sub">A growing collection of moments, shared by friends and family.</p>
+</section>
+
+<section class="upload-panel">
+  <form id="photo-form" class="form" enctype="multipart/form-data">
+    <div class="field-row">
+      <label class="field">
+        <span>Your name</span>
+        <input type="text" name="name" maxlength="80" required>
+      </label>
+      <label class="field">
+        <span>Caption <em>(optional)</em></span>
+        <input type="text" name="caption" maxlength="160" placeholder="A few words about this photo">
+      </label>
+    </div>
+    <label class="field file-field">
+      <span>Choose a photo</span>
+      <input type="file" name="photo" accept="image/*" required>
+    </label>
+    <button type="submit" class="btn">Share photo</button>
+    <p class="form-note">Photos appear once Tony &amp; Kate have approved them.</p>
+    <div class="form-msg" id="photo-msg" hidden></div>
+  </form>
+</section>
+
+<section class="masonry">
+  {% if photos %}
+    {% for p in photos %}
+    <figure class="masonry-item fade-in">
+      <img src="{{ p['cloudinary_url'] }}" alt="{{ p['caption'] or 'Wedding photo' }}" loading="lazy">
+      {% if p['caption'] %}<figcaption>{{ p['caption'] }}</figcaption>{% endif %}
+      <span class="by">— {{ p['uploader_name'] }}</span>
+    </figure>
+    {% endfor %}
+  {% else %}
+    <p class="empty">No photos yet — be the first to share one.</p>
+  {% endif %}
+</section>
+{% endblock %}
