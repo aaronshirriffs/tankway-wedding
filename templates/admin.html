@@ -3,56 +3,78 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin · Tony &amp; Kate</title>
+  <title>Admin · Kate &amp; Tony</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ static_v('style.css') }}">
 </head>
 <body class="admin-body">
   <header class="admin-header">
-    <h1>Tony &amp; Kate — Admin</h1>
+    <h1>Kate &amp; Tony — Admin</h1>
     <a href="{{ url_for('index') }}" class="admin-back">View site →</a>
   </header>
 
   <nav class="admin-tabs">
     <button class="tab active" data-tab="photos">Photos <span class="badge" id="badge-photos"></span></button>
     <button class="tab" data-tab="wishes">Wishes</button>
-    <button class="tab" data-tab="ebook">Keepsake</button>
+    <button class="tab" data-tab="wall">Wall preview</button>
   </nav>
 
   <main class="admin-main">
     <section class="tab-panel active" id="panel-photos">
-      <h2 class="admin-subhead">Awaiting approval <span class="badge" id="badge-photos-head"></span></h2>
-      <p class="panel-hint">New uploads, hidden from the site until you approve them.</p>
-      <div class="admin-grid" id="photos-pending"></div>
-
-      <h2 class="admin-subhead with-rule">Approved photos</h2>
-      <p class="panel-hint">Already live on the public gallery — delete any to remove them retrospectively.</p>
+      <div class="cloud-usage" id="cloud-usage">Checking Cloudinary usage…</div>
+      <h2 class="admin-subhead">In the album <span class="badge" id="badge-photos-head"></span></h2>
+      <p class="panel-hint">Every contributor's photos. They're private to each uploader until the
+        wedding day, then revealed together. Hide anything you don't want in the reveal, or delete it.</p>
       <div class="admin-grid" id="photos-approved"></div>
+
+      <h2 class="admin-subhead with-rule">Hidden from the album</h2>
+      <p class="panel-hint">These won't appear in the reveal or keepsake. Show to put them back.</p>
+      <div class="admin-grid" id="photos-pending"></div>
     </section>
 
     <section class="tab-panel" id="panel-wishes">
-      <p class="panel-hint">All wishes (auto-published). Delete to remove.</p>
+      <p class="panel-hint">Every contributor's wishes. Hide anything you don't want in the reveal, or delete it.</p>
       <div class="admin-list" id="wishes-list"></div>
     </section>
 
-    <section class="tab-panel" id="panel-ebook">
-      <h2 class="admin-subhead">The Keepsake E-book</h2>
+    <section class="tab-panel" id="panel-wall">
+      <h2 class="admin-subhead">Wedding-day wall — live preview</h2>
       <p class="panel-hint">
-        A PDF gathering every approved photo and well wish. It's emailed to the couple
-        automatically once the wedding day arrives — or preview/send it any time below.
+        Exactly what the home page becomes on the wedding day, built from the
+        {{ photo_count }} photo{{ '' if photo_count == 1 else 's' }} and
+        {{ wish_count }} wish{{ '' if wish_count == 1 else 'es' }} currently in the album.
+        <a href="{{ url_for('admin') }}">↻ Refresh</a> after hiding or adding items.
       </p>
-      <div class="ebook-status" id="ebook-status">Loading…</div>
-      <div class="ebook-actions">
-        <a class="btn" id="ebook-download" href="{{ url_for('admin_ebook') }}" target="_blank" rel="noopener">Download preview (PDF)</a>
-        <button class="btn btn-soft" id="ebook-send">Email it to the couple now</button>
+      {% if tiles %}
+      <div class="reveal-masonry wall-preview">
+        {% for tile in tiles %}
+          {% if tile.kind == 'photo' %}
+            <figure class="r-tile r-photo">
+              <img src="{{ tile.url }}" loading="lazy" alt="{{ tile.caption or 'Wedding photo' }}">
+              {% if tile.caption or tile.who %}
+              <figcaption>
+                {% if tile.caption %}<span class="r-cap">{{ tile.caption }}</span>{% endif %}
+                {% if tile.who %}<span class="by">— {{ tile.who }}</span>{% endif %}
+              </figcaption>
+              {% endif %}
+            </figure>
+          {% else %}
+            <article class="r-tile r-wish wbg-{{ loop.index0 % 3 }}">
+              <p class="r-wish-text">“{{ tile.message }}”</p>
+              <span class="r-wish-by">— {{ tile.who }}</span>
+            </article>
+          {% endif %}
+        {% endfor %}
       </div>
-      <div class="form-msg" id="ebook-msg" hidden></div>
+      {% else %}
+      <p class="empty">No photos or wishes in the album yet — they'll appear here as people add them.</p>
+      {% endif %}
     </section>
   </main>
 
   <script>window.WEDDING = { base: "{{ url_for('admin') }}" };</script>
-  <script src="{{ url_for('static', filename='main.js') }}"></script>
+  <script src="{{ static_v('main.js') }}"></script>
 </body>
 </html>

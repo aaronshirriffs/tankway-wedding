@@ -1,5 +1,5 @@
 /* ===========================================================================
-   Tony & Kate — vanilla JS: countdown, form handling, fade-in, admin panel.
+   Kate & Tony — vanilla JS: countdown, form handling, fade-in, admin panel.
    =========================================================================== */
 (function () {
   "use strict";
@@ -33,7 +33,7 @@
         festive.innerHTML =
           '<span class="festive-burst">🌺 🥂 🎉</span>' +
           '<span class="festive-headline">Today’s the day!</span>' +
-          '<span class="festive-sub">Tony &amp; Kate are getting married in Fiji</span>';
+          '<span class="festive-sub">Kate &amp; Tony are getting married in Fiji</span>';
         festive.hidden = false;
         clearInterval(timer);
         return;
@@ -217,19 +217,22 @@
       await fetch(api(path), { method: "POST", headers: { "X-Requested-With": "fetch" } });
     }
 
-    function photoCard(p, withApprove) {
+    function photoCard(p) {
       const card = document.createElement("div");
-      card.className = "admin-card";
+      card.className = "admin-card" + (p.approved ? "" : " is-hidden");
+      const toggle = p.approved
+        ? '<button class="mini neutral">Hide</button>'
+        : '<button class="mini approve">Show</button>';
       card.innerHTML =
         '<img src="' + p.cloudinary_url + '" alt="">' +
         '<div class="meta"><b>' + escapeHtml(p.uploader_name) + "</b><small>" +
         escapeHtml(p.caption || "No caption") + "</small></div>" +
-        '<div class="actions">' +
-        (withApprove ? '<button class="mini approve">Approve</button>' : "") +
+        '<div class="actions">' + toggle +
         '<button class="mini danger">Delete</button></div>';
-      if (withApprove) {
-        card.querySelector(".approve").onclick = async () => { await post("/photos/" + p.id + "/approve"); loadPhotos(); };
-      }
+      card.querySelector(".neutral, .approve").onclick = async () => {
+        await post("/photos/" + p.id + (p.approved ? "/hide" : "/approve"));
+        loadPhotos();
+      };
       card.querySelector(".danger").onclick = async () => {
         if (confirm("Delete this photo permanently?")) { await post("/photos/" + p.id + "/delete"); loadPhotos(); }
       };
@@ -238,30 +241,21 @@
 
     async function loadPhotos() {
       const data = await (await fetch(api("/photos"))).json();
-      const pending = data.filter((p) => !p.approved);
-      const approved = data.filter((p) => p.approved);
+      const inAlbum = data.filter((p) => p.approved);
+      const hidden = data.filter((p) => !p.approved);
 
-      [document.getElementById("badge-photos"), document.getElementById("badge-photos-head")].forEach((b) => {
-        if (!b) return;
-        b.textContent = pending.length;
-        b.classList.toggle("show", pending.length > 0);
-      });
-
-      const pendingList = document.getElementById("photos-pending");
-      pendingList.innerHTML = "";
-      if (!pending.length) {
-        pendingList.innerHTML = '<p class="empty">Nothing awaiting approval.</p>';
-      } else {
-        pending.forEach((p) => pendingList.appendChild(photoCard(p, true)));
-      }
+      const tabBadge = document.getElementById("badge-photos");
+      if (tabBadge) { tabBadge.textContent = hidden.length; tabBadge.classList.toggle("show", hidden.length > 0); }
+      const headBadge = document.getElementById("badge-photos-head");
+      if (headBadge) { headBadge.textContent = inAlbum.length; headBadge.classList.toggle("show", inAlbum.length > 0); }
 
       const approvedList = document.getElementById("photos-approved");
-      approvedList.innerHTML = "";
-      if (!approved.length) {
-        approvedList.innerHTML = '<p class="empty">No approved photos yet.</p>';
-      } else {
-        approved.forEach((p) => approvedList.appendChild(photoCard(p, false)));
-      }
+      approvedList.innerHTML = inAlbum.length ? "" : '<p class="empty">No photos in the album yet.</p>';
+      inAlbum.forEach((p) => approvedList.appendChild(photoCard(p)));
+
+      const pendingList = document.getElementById("photos-pending");
+      pendingList.innerHTML = hidden.length ? "" : '<p class="empty">Nothing hidden.</p>';
+      hidden.forEach((p) => pendingList.appendChild(photoCard(p)));
     }
 
     async function loadWishes() {
@@ -271,11 +265,19 @@
       list.innerHTML = "";
       data.forEach((w) => {
         const row = document.createElement("div");
-        row.className = "admin-row";
+        row.className = "admin-row" + (w.approved ? "" : " is-hidden");
+        const toggle = w.approved
+          ? '<button class="mini neutral">Hide</button>'
+          : '<button class="mini approve">Show</button>';
         row.innerHTML =
           '<div class="row-body"><p>' + escapeHtml(w.message) + "</p><small>— " +
-          escapeHtml(w.name) + "</small></div>" +
-          '<div class="row-actions"><button class="mini danger">Delete</button></div>';
+          escapeHtml(w.name) + (w.approved ? "" : " · hidden") + "</small></div>" +
+          '<div class="row-actions">' + toggle +
+          '<button class="mini danger">Delete</button></div>';
+        row.querySelector(".neutral, .approve").onclick = async () => {
+          await post("/wishes/" + w.id + (w.approved ? "/hide" : "/show"));
+          loadWishes();
+        };
         row.querySelector(".danger").onclick = async () => {
           if (confirm("Delete this wish?")) { await post("/wishes/" + w.id + "/delete"); loadWishes(); }
         };
@@ -283,55 +285,33 @@
       });
     }
 
-    async function loadEbook() {
-      const box = document.getElementById("ebook-status");
+    async function loadCloudUsage() {
+      const box = document.getElementById("cloud-usage");
       if (!box) return;
       try {
-        const s = await (await fetch(api("/ebook"))).json();
-        const auto = s.auto_sent
-          ? '<span class="tag delivered">already auto-sent</span>'
-          : '<span class="tag">scheduled for ' + escapeHtml(s.wedding_date) + '</span>';
-        const smtp = s.smtp_ready
-          ? ""
-          : '<p class="ebook-warn">⚠ Email isn\'t configured yet — fill in SMTP settings in .env before the wedding day, or the auto-send won\'t work.</p>';
+        const s = await (await fetch(api("/cloudinary"))).json();
+        if (!s.ready) { box.innerHTML = '<span class="cu-label">Cloudinary isn\'t configured yet.</span>'; return; }
+        if (s.error) { box.innerHTML = '<span class="cu-label">Couldn\'t load Cloudinary usage right now.</span>'; return; }
+        const pct = Math.max(0, Math.min(100, Number(s.used_percent) || 0));
+        const tone = pct >= 90 ? "red" : pct >= 70 ? "amber" : "green";
+        const gb = (b) => (b ? (b / 1073741824).toFixed(2) : "0.00");
+        const used = (Number(s.credits_used) || 0).toFixed(2);
+        const limit = s.credits_limit != null ? s.credits_limit : 25;
         box.innerHTML =
-          "<p><strong>" + s.photos + "</strong> photo" + (s.photos === 1 ? "" : "s") +
-          " &amp; <strong>" + s.wishes + "</strong> wish" + (s.wishes === 1 ? "" : "es") +
-          " will be included.</p>" +
-          "<p>Auto-delivery: " + auto +
-          (s.couple_email ? " to <strong>" + escapeHtml(s.couple_email) + "</strong>" : "") + "</p>" +
-          smtp;
-        const sendBtn = document.getElementById("ebook-send");
-        if (sendBtn) sendBtn.disabled = !s.smtp_ready;
+          '<div class="cu-top"><span class="cu-label">Cloudinary — storage &amp; bandwidth</span>' +
+          '<span class="cu-pct ' + tone + '">' + pct.toFixed(1) + '% of free plan</span></div>' +
+          '<div class="cu-bar"><span class="cu-fill ' + tone + '" style="width:' + pct + '%"></span></div>' +
+          '<div class="cu-meta">' + used + ' / ' + limit + ' credits used · ' +
+          gb(s.storage_bytes) + ' GB stored · ' + (s.objects || 0) + ' file' + ((s.objects === 1) ? '' : 's') +
+          (pct >= 70 ? ' · <strong>nearing the free limit</strong>' : '') + '</div>';
       } catch (_) {
-        box.textContent = "Could not load keepsake status.";
+        box.innerHTML = '<span class="cu-label">Couldn\'t load Cloudinary usage right now.</span>';
       }
-    }
-
-    const sendBtn = document.getElementById("ebook-send");
-    if (sendBtn) {
-      sendBtn.addEventListener("click", async () => {
-        const msg = document.getElementById("ebook-msg");
-        if (!confirm("Generate and email the keepsake e-book to the couple now?")) return;
-        sendBtn.disabled = true;
-        const original = sendBtn.textContent;
-        sendBtn.textContent = "Sending…";
-        try {
-          const res = await fetch(base + "/ebook/send", { method: "POST", headers: { "X-Requested-With": "fetch" } });
-          const data = await res.json();
-          showMsg(msg, data.message, data.ok);
-        } catch (_) {
-          showMsg(msg, "Something went wrong sending the e-book.", false);
-        } finally {
-          sendBtn.disabled = false;
-          sendBtn.textContent = original;
-        }
-      });
     }
 
     loadPhotos();
     loadWishes();
-    loadEbook();
+    loadCloudUsage();
   }
 
   /* --- Boot --------------------------------------------------------------- */

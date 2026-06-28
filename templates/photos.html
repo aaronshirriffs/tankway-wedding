@@ -1,10 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Photos · Tony &amp; Kate{% endblock %}
+{% block title %}Photos · Kate &amp; Tony{% endblock %}
 
 {% block content %}
 <section class="page-head">
-  <h1>The Album</h1>
-  <p class="page-sub">A growing collection of moments, shared by friends and family.</p>
+  <h1>{{ 'The Album' if revealed else 'Add to the Album' }}</h1>
+  {% if revealed %}
+  <p class="page-sub">A collection of moments, shared by friends and family.</p>
+  {% else %}
+  <p class="page-sub">Add your photos for Kate &amp; Tony. They stay private to you until
+    the whole album is revealed on the wedding day.</p>
+  {% endif %}
 </section>
 
 <section class="upload-panel">
@@ -23,11 +28,21 @@
       <span>Choose a photo</span>
       <input type="file" name="photo" accept="image/*" required>
     </label>
-    <button type="submit" class="btn">Share photo</button>
-    <p class="form-note">Photos appear once Tony &amp; Kate have approved them.</p>
+    <button type="submit" class="btn">Add photo</button>
+    {% if revealed %}
+    <p class="form-note">Your photo joins the album right away.</p>
+    {% else %}
+    <p class="form-note">Only you can see your photos until the wedding-day reveal.</p>
+    {% endif %}
     <div class="form-msg" id="photo-msg" hidden></div>
   </form>
 </section>
+
+{% if not revealed %}
+<section class="private-note">
+  <p>👇 The photos below are visible <strong>only to you</strong> — everyone's are revealed together on the wedding day.</p>
+</section>
+{% endif %}
 
 <section class="masonry">
   {% if photos %}
@@ -39,7 +54,10 @@
     </figure>
     {% endfor %}
   {% else %}
-    <p class="empty">No photos yet — be the first to share one.</p>
+    <p class="empty">
+      {{ "No photos yet — be the first to add one." if revealed
+         else "You haven't added any photos yet. The ones you add will appear here, just for you." }}
+    </p>
   {% endif %}
 </section>
 {% endblock %}
