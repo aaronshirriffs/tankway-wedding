@@ -162,7 +162,7 @@ def is_revealed():
 
 def balanced_interleave(photos, wishes):
     """Mix two lists in proportion so the scarcer type spreads evenly. Returns
-    a list of ("photo"|"wish", row) tuples. Shared by the web reveal and e-book."""
+    a list of ("photo"|"wish", row) tuples. Shared by the web reveal."""
     items = []
     i = j = 0
     npn, nwn = len(photos), len(wishes)
