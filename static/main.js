@@ -217,6 +217,85 @@
       await fetch(api(path), { method: "POST", headers: { "X-Requested-With": "fetch" } });
     }
 
+    async function postJSON(path, body) {
+      await fetch(api(path), {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Requested-With": "fetch" },
+        body: JSON.stringify(body),
+      });
+    }
+
+    /* --- Bulk selection (photos + wishes) -------------------------------- */
+    function selBoxes(kind) {
+      return document.querySelectorAll("#panel-" + kind + " .sel-box");
+    }
+    function selectedIds(kind) {
+      return Array.from(selBoxes(kind))
+        .filter((b) => b.checked)
+        .map((b) => Number(b.dataset.id));
+    }
+    // Show/hide the sticky action bar and keep its "N selected" count current.
+    function refreshBulkBar(kind) {
+      const n = selectedIds(kind).length;
+      const nEl = document.getElementById("bulk-" + kind + "-n");
+      const bar = document.getElementById("bulk-" + kind);
+      if (nEl) nEl.textContent = n;
+      if (bar) bar.hidden = n === 0;
+    }
+    // Wire a freshly-built checkbox so the card highlights and the bar updates.
+    function wireSelBox(box) {
+      box.addEventListener("change", () => {
+        const card = box.closest(".admin-card, .admin-row");
+        if (card) card.classList.toggle("selected", box.checked);
+        refreshBulkBar(box.dataset.kind);
+      });
+    }
+    function setAll(kind, checked) {
+      selBoxes(kind).forEach((b) => {
+        b.checked = checked;
+        const card = b.closest(".admin-card, .admin-row");
+        if (card) card.classList.toggle("selected", checked);
+      });
+      refreshBulkBar(kind);
+    }
+
+    async function handleBulk(action) {
+      if (action === "photos-all") return setAll("photos", true);
+      if (action === "photos-clear") return setAll("photos", false);
+      if (action === "wishes-all") return setAll("wishes", true);
+      if (action === "wishes-clear") return setAll("wishes", false);
+
+      if (action === "photos-show" || action === "photos-hide") {
+        const ids = selectedIds("photos");
+        if (!ids.length) return;
+        await postJSON("/photos/bulk-" + (action === "photos-show" ? "show" : "hide"), { ids });
+        loadPhotos();
+        return;
+      }
+      if (action === "photos-delete") {
+        const ids = selectedIds("photos");
+        if (!ids.length) return;
+        if (!confirm("Delete " + ids.length + " photo" + (ids.length === 1 ? "" : "s") +
+            " permanently? This also removes them from Cloudinary.")) return;
+        await postJSON("/photos/bulk-delete", { ids });
+        loadPhotos();
+        return;
+      }
+      if (action === "wishes-delete") {
+        const ids = selectedIds("wishes");
+        if (!ids.length) return;
+        if (!confirm("Delete " + ids.length + " wish" + (ids.length === 1 ? "" : "es") +
+            " permanently?")) return;
+        await postJSON("/wishes/bulk-delete", { ids });
+        loadWishes();
+        return;
+      }
+    }
+
+    document.querySelectorAll("[data-bulk]").forEach((btn) => {
+      btn.addEventListener("click", () => handleBulk(btn.dataset.bulk));
+    });
+
     function photoCard(p) {
       const card = document.createElement("div");
       card.className = "admin-card" + (p.approved ? "" : " is-hidden");
@@ -224,11 +303,13 @@
         ? '<button class="mini neutral">Hide</button>'
         : '<button class="mini approve">Show</button>';
       card.innerHTML =
+        '<label class="sel"><input type="checkbox" class="sel-box" data-kind="photos" data-id="' + p.id + '"></label>' +
         '<img src="' + p.cloudinary_url + '" alt="">' +
         '<div class="meta"><b>' + escapeHtml(p.uploader_name) + "</b><small>" +
         escapeHtml(p.caption || "No caption") + "</small></div>" +
         '<div class="actions">' + toggle +
         '<button class="mini danger">Delete</button></div>';
+      wireSelBox(card.querySelector(".sel-box"));
       card.querySelector(".neutral, .approve").onclick = async () => {
         await post("/photos/" + p.id + (p.approved ? "/hide" : "/approve"));
         loadPhotos();
@@ -256,12 +337,14 @@
       const pendingList = document.getElementById("photos-pending");
       pendingList.innerHTML = hidden.length ? "" : '<p class="empty">Nothing hidden.</p>';
       hidden.forEach((p) => pendingList.appendChild(photoCard(p)));
+
+      refreshBulkBar("photos");  // grids were rebuilt — selection is gone
     }
 
     async function loadWishes() {
       const list = document.getElementById("wishes-list");
       const data = await (await fetch(api("/wishes"))).json();
-      if (!data.length) { list.innerHTML = '<p class="empty">No wishes yet.</p>'; return; }
+      if (!data.length) { list.innerHTML = '<p class="empty">No wishes yet.</p>'; refreshBulkBar("wishes"); return; }
       list.innerHTML = "";
       data.forEach((w) => {
         const row = document.createElement("div");
@@ -270,10 +353,12 @@
           ? '<button class="mini neutral">Hide</button>'
           : '<button class="mini approve">Show</button>';
         row.innerHTML =
+          '<label class="sel"><input type="checkbox" class="sel-box" data-kind="wishes" data-id="' + w.id + '"></label>' +
           '<div class="row-body"><p>' + escapeHtml(w.message) + "</p><small>— " +
           escapeHtml(w.name) + (w.approved ? "" : " · hidden") + "</small></div>" +
           '<div class="row-actions">' + toggle +
           '<button class="mini danger">Delete</button></div>';
+        wireSelBox(row.querySelector(".sel-box"));
         row.querySelector(".neutral, .approve").onclick = async () => {
           await post("/wishes/" + w.id + (w.approved ? "/hide" : "/show"));
           loadWishes();
@@ -283,6 +368,7 @@
         };
         list.appendChild(row);
       });
+      refreshBulkBar("wishes");  // list was rebuilt — selection is gone
     }
 
     async function loadCloudUsage() {

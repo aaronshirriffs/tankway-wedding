@@ -32,11 +32,29 @@
       <h2 class="admin-subhead with-rule">Hidden from the album</h2>
       <p class="panel-hint">These won't appear in the reveal or keepsake. Show to put them back.</p>
       <div class="admin-grid" id="photos-pending"></div>
+
+      <div class="bulk-bar" id="bulk-photos" hidden>
+        <span class="bulk-count"><span id="bulk-photos-n">0</span> selected</span>
+        <button class="mini" data-bulk="photos-all">Select all</button>
+        <button class="mini" data-bulk="photos-clear">Clear</button>
+        <span class="bulk-spacer"></span>
+        <button class="mini approve" data-bulk="photos-show">Show</button>
+        <button class="mini neutral" data-bulk="photos-hide">Hide</button>
+        <button class="mini danger" data-bulk="photos-delete">Delete selected</button>
+      </div>
     </section>
 
     <section class="tab-panel" id="panel-wishes">
       <p class="panel-hint">Every contributor's wishes. Hide anything you don't want in the reveal, or delete it.</p>
       <div class="admin-list" id="wishes-list"></div>
+
+      <div class="bulk-bar" id="bulk-wishes" hidden>
+        <span class="bulk-count"><span id="bulk-wishes-n">0</span> selected</span>
+        <button class="mini" data-bulk="wishes-all">Select all</button>
+        <button class="mini" data-bulk="wishes-clear">Clear</button>
+        <span class="bulk-spacer"></span>
+        <button class="mini danger" data-bulk="wishes-delete">Delete selected</button>
+      </div>
     </section>
 
     <section class="tab-panel" id="panel-wall">

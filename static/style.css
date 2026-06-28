@@ -430,6 +430,32 @@ textarea { resize: vertical; }
 .mini.danger   { background: #fff; color: #b1502a; border-color: #e7c2ab; }
 .mini.danger:hover { background: #fbeee6; }
 
+/* --- Bulk select (admin photos + wishes) --------------------------------- */
+.admin-card { position: relative; }
+.admin-card .sel {
+  position: absolute; top: 10px; left: 10px; z-index: 2;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: rgba(255, 255, 255, .92); border: 1px solid var(--sand-deep);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: var(--shadow-sm);
+}
+.admin-row .sel { display: flex; align-items: center; padding-top: 2px; cursor: pointer; }
+.sel-box { width: 18px; height: 18px; accent-color: var(--teal); cursor: pointer; margin: 0; }
+.admin-card.selected, .admin-row.selected {
+  outline: 2px solid var(--teal); outline-offset: -2px;
+  box-shadow: 0 0 0 4px var(--aqua-soft);
+}
+
+/* Sticky action bar — appears only when something is selected */
+.bulk-bar {
+  position: sticky; bottom: 16px; z-index: 5; margin-top: 26px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--cream); border: 1px solid var(--sand-deep); border-radius: 999px;
+  padding: 10px 16px; box-shadow: var(--shadow-md, 0 8px 28px rgba(0, 0, 0, .14));
+}
+.bulk-count { font-weight: 600; color: var(--ink); margin-right: 2px; }
+.bulk-spacer { flex: 1 1 auto; }
+
 /* --- Responsive ----------------------------------------------------------- */
 @media (max-width: 620px) {
   .field-row { grid-template-columns: 1fr; }

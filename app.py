@@ -410,6 +410,19 @@ def rows_to_dicts(rows):
     return [dict(r) for r in rows]
 
 
+def requested_ids():
+    """Pull a list of integer ids from a bulk-action JSON body ({"ids": [...]}).
+    Silently drops anything non-integer so one bad value can't fail the batch."""
+    data = request.get_json(silent=True) or {}
+    out = []
+    for v in data.get("ids", []):
+        try:
+            out.append(int(v))
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
 @app.route("/admin/api/photos")
 @require_admin
 def admin_photos():
@@ -453,6 +466,53 @@ def admin_photo_delete(pid):
     return jsonify(ok=True)
 
 
+# --- Bulk photo actions ------------------------------------------------------
+# Each takes a JSON body {"ids": [...]} and applies one action to the whole set,
+# so the admin can clear out a batch in a single click.
+@app.route("/admin/api/photos/bulk-hide", methods=["POST"])
+@require_admin
+def admin_photos_bulk_hide(approved=0):
+    ids = requested_ids()
+    if not ids:
+        return jsonify(ok=True, count=0)
+    db = get_db()
+    placeholders = ",".join("?" * len(ids))
+    db.execute(f"UPDATE photos SET approved = ? WHERE id IN ({placeholders})",
+               [approved, *ids])
+    db.commit()
+    return jsonify(ok=True, count=len(ids))
+
+
+@app.route("/admin/api/photos/bulk-show", methods=["POST"])
+@require_admin
+def admin_photos_bulk_show():
+    return admin_photos_bulk_hide(approved=1)
+
+
+@app.route("/admin/api/photos/bulk-delete", methods=["POST"])
+@require_admin
+def admin_photos_bulk_delete():
+    ids = requested_ids()
+    if not ids:
+        return jsonify(ok=True, count=0)
+    db = get_db()
+    placeholders = ",".join("?" * len(ids))
+    rows = db.execute(
+        f"SELECT cloudinary_public_id FROM photos WHERE id IN ({placeholders})", ids
+    ).fetchall()
+    if CLOUDINARY_READY:
+        for row in rows:
+            pubid = row["cloudinary_public_id"]
+            if pubid and pubid != DEMO_TAG:
+                try:
+                    cloudinary.uploader.destroy(pubid)
+                except Exception:
+                    pass  # don't let one Cloudinary hiccup abort the DB cleanup
+    db.execute(f"DELETE FROM photos WHERE id IN ({placeholders})", ids)
+    db.commit()
+    return jsonify(ok=True, count=len(ids))
+
+
 @app.route("/admin/api/wishes")
 @require_admin
 def admin_wishes():
@@ -486,6 +546,20 @@ def admin_wish_delete(wid):
     db.execute("DELETE FROM wishes WHERE id = ?", (wid,))
     db.commit()
     return jsonify(ok=True)
+
+
+@app.route("/admin/api/wishes/bulk-delete", methods=["POST"])
+@require_admin
+def admin_wishes_bulk_delete():
+    """Delete a whole set of wishes in one click. Body: {"ids": [...]}."""
+    ids = requested_ids()
+    if not ids:
+        return jsonify(ok=True, count=0)
+    db = get_db()
+    placeholders = ",".join("?" * len(ids))
+    db.execute(f"DELETE FROM wishes WHERE id IN ({placeholders})", ids)
+    db.commit()
+    return jsonify(ok=True, count=len(ids))
 
 
 @app.route("/admin/api/cloudinary")
