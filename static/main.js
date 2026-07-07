@@ -106,6 +106,7 @@
     const form = document.getElementById("photo-form");
     if (!form) return;
     const msg = document.getElementById("photo-msg");
+    const wall = document.getElementById("photo-masonry");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = form.querySelector("button");
@@ -118,6 +119,22 @@
         });
         const data = await res.json();
         showMsg(msg, data.message, data.ok);
+        if (data.ok && data.photo && wall) {
+          const empty = document.getElementById("photos-empty");
+          if (empty) empty.remove();
+          const fig = document.createElement("figure");
+          fig.className = "masonry-item fade-in";
+          const cap = data.photo.caption
+            ? '<figcaption>' + escapeHtml(data.photo.caption) + "</figcaption>"
+            : "";
+          fig.innerHTML =
+            '<img src="' + data.photo.url + '" alt="' +
+            escapeHtml(data.photo.caption || "Wedding photo") + '" loading="lazy">' +
+            cap +
+            '<span class="by">— ' + escapeHtml(data.photo.name) + "</span>";
+          wall.prepend(fig);
+          requestAnimationFrame(() => fig.classList.add("visible"));
+        }
         if (data.ok) form.reset();
       } catch (_) {
         showMsg(msg, "Something went wrong. Please try again.", false);

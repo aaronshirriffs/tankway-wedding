@@ -312,7 +312,10 @@ textarea { resize: vertical; }
 }
 .vault-label { color: var(--ink-soft); letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
 
-.empty { text-align: center; color: var(--ink-soft); padding: 40px 0; font-style: italic; grid-column: 1 / -1; }
+/* Empty-state lives inside multi-column (.masonry/.wish-wall) and grid (.admin-grid)
+   containers. column-span:all keeps the paragraph on one line instead of being
+   split down the columns; grid-column:1/-1 does the equivalent in the grids. */
+.empty { text-align: center; color: var(--ink-soft); padding: 40px 0; font-style: italic; grid-column: 1 / -1; column-span: all; break-inside: avoid; }
 
 /* --- Fade-in -------------------------------------------------------------- */
 .fade-in { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }

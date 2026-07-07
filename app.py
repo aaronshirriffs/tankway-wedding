@@ -188,10 +188,17 @@ def ensure_contributor():
 @app.after_request
 def save_contributor(response):
     if getattr(g, "new_contrib", False):
+        # Scope the cookie to THIS request's mount point, not the static
+        # URL_PREFIX. The app is served both under /wedding/ (tools.tankway)
+        # and at the domain root (kateandtony.co.nz). request.script_root is
+        # "" at the root and "/wedding" under the prefix, so the cookie is sent
+        # back on every page of whichever host the visitor is using. (Using the
+        # fixed URL_PREFIX meant the root site never got the cookie back, so
+        # each request looked like a new visitor and uploads "vanished".)
         response.set_cookie(
             CONTRIB_COOKIE, g.contrib_id,
             max_age=60 * 60 * 24 * 400, samesite="Lax",
-            path=(URL_PREFIX + "/" if URL_PREFIX else "/"),
+            path=(request.script_root + "/") if request.script_root else "/",
         )
     return response
 
@@ -316,11 +323,12 @@ def upload_photo():
     except Exception:
         return jsonify(ok=False, message="Sorry, that upload failed. Please try again."), 500
 
+    secure_url = result.get("secure_url")
     db = get_db()
     db.execute(
         "INSERT INTO photos (uploader_name, cloudinary_url, cloudinary_public_id, "
         "caption, submitted_at, approved, contributor_id) VALUES (?, ?, ?, ?, ?, 1, ?)",
-        (name, result.get("secure_url"), result.get("public_id"), caption, now_iso(),
+        (name, secure_url, result.get("public_id"), caption, now_iso(),
          g.contrib_id),
     )
     db.commit()
@@ -329,7 +337,10 @@ def upload_photo():
     else:
         msg = ("Thank you! Your photo is saved. For now only you can see it — "
                "everyone's photos are revealed together on the wedding day. 🌺")
-    return jsonify(ok=True, message=msg)
+    # Return the photo so the client can show it immediately, matching the
+    # wish form's live-append (otherwise it only appears after a page reload).
+    return jsonify(ok=True, message=msg,
+                   photo={"url": secure_url, "caption": caption, "name": name})
 
 
 @app.route("/wishes", methods=["GET"])

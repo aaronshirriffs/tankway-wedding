@@ -44,7 +44,7 @@
 </section>
 {% endif %}
 
-<section class="masonry">
+<section class="masonry" id="photo-masonry">
   {% if photos %}
     {% for p in photos %}
     <figure class="masonry-item fade-in">
@@ -54,7 +54,7 @@
     </figure>
     {% endfor %}
   {% else %}
-    <p class="empty">
+    <p class="empty" id="photos-empty">
       {{ "No photos yet — be the first to add one." if revealed
          else "You haven't added any photos yet. The ones you add will appear here, just for you." }}
     </p>
