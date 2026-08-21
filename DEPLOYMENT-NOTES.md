@@ -12,18 +12,19 @@ As of 21 August 2026:
 | Process | `gunicorn -w 2 -b 127.0.0.1:5005 app:app` via `wedding.service` |
 | Deploy method | manual `git pull` on the server |
 
-Two things in this repo are **out of date** and should not be trusted:
+One thing in this repo is **out of date**: `app.py` and `nginx-wedding.conf`
+both describe the site as living at `tools.tankway.co.nz/wedding/`. The live
+domain is `kateandtony.co.nz`.
 
-* `app.py` and `nginx-wedding.conf` both document the site as living at
-  `tools.tankway.co.nz/wedding/`. The live domain is `kateandtony.co.nz`.
-* **`main` does not match what is deployed.** The server's checkout carries
-  commits that were never pushed to GitHub — at minimum its own templates and
-  its own `static/style.css`, whose markup and class names differ from the
-  templates in this repo. `git pull` on the server reports divergent branches
-  as a result.
+`main` was reconciled with the deployed code on 21 August 2026. The server's
+four unpushed commits — the Big Reveal home page, the admin bulk actions, and
+the removal of the e-book concept — were merged in and are now the basis of
+`main`. A copy of the server's state as pushed that day is preserved on the
+`server-live` branch.
 
-Until the server's commits are pushed up, treat the server as the source of
-truth for the front end, not this repository.
+The server itself has **not** pulled since. It is one `git pull` behind `main`,
+and still carries a hand-appended `.fade-in{opacity:1!important}` line in its
+working copy from the recovery described below.
 
 ## 21 August 2026 — album and wishes rendered invisible
 
@@ -95,16 +96,14 @@ repository.
 
 ## Outstanding
 
-* **Push the server's commits to GitHub.** From `/root/wedding`:
-  `git push origin HEAD:refs/heads/server-live`. Until this happens nobody can
-  review, back up, or safely change the deployed front end.
-* **Reconcile** those commits with `main` so the two stop diverging, and fold
-  the `!important` override into the real stylesheet rather than leaving it
-  appended.
+* **Deploy `main` to the server.** Once `git pull` succeeds there, the
+  hand-appended `!important` override at the end of `static/style.css` can be
+  deleted — commit `93cf217` supersedes it properly.
 * **Correct the stale domain references** in `app.py` and `nginx-wedding.conf`.
 * **Serve resized images.** `app.py` stores Cloudinary's `secure_url`, the
-  untouched original, so every album view downloads full-resolution camera
-  files. Requesting a width-limited, `f_auto,q_auto` derivative instead would
-  cut page weight dramatically.
+  untouched original, so every reveal view downloads full-resolution camera
+  files — several megabytes each. Requesting a width-limited `f_auto,q_auto`
+  derivative instead would cut page weight dramatically. This is the single
+  biggest improvement left.
 * **Automate deployment**, so changes reach the server without hand-editing
   files over a console.
