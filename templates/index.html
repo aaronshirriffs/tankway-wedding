@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Tony &amp; Kate · 20 August 2026 · Fiji{% endblock %}
+{% block title %}Kate &amp; Tony · 20 August 2026 · Fiji{% endblock %}
 
 {% block content %}
 <section class="hero">
   <div class="hero-inner">
-    <p class="hero-eyebrow">together with their families</p>
-    <h1 class="hero-names">Tony <span>&amp;</span> Kate</h1>
+    <p class="hero-eyebrow">From Family and Friends</p>
+    <h1 class="hero-names">Kate <span>&amp;</span> Tony</h1>
     <p class="hero-date">20 August 2026 <span class="dot">·</span> Fiji</p>
 
     <div class="countdown" id="countdown" data-wedding="{{ wedding_date }}">
@@ -17,37 +17,74 @@
     <p class="countdown-married" id="countdown-married" hidden></p>
     <div class="countdown-festive" id="countdown-festive" hidden></div>
   </div>
-  <div class="hero-wave" aria-hidden="true"></div>
 </section>
 
+<div class="hero-divider" aria-hidden="true"></div>
+
+{% if revealed %}
+{# ---- THE BIG REVEAL: home page becomes the full album + wishes ---- #}
+<section class="reveal-intro">
+  <h2 class="reveal-title">The Album &amp; Well Wishes</h2>
+  <p class="reveal-sub">Every photo and message gathered for Kate &amp; Tony — revealed at last.</p>
+</section>
+
+<section class="reveal-masonry">
+  {% for tile in tiles %}
+    {% if tile.kind == 'photo' %}
+      <figure class="r-tile r-photo fade-in">
+        <img src="{{ tile.url }}" alt="{{ tile.caption or 'Wedding photo' }}" loading="lazy">
+        {% if tile.caption or tile.who %}
+        <figcaption>
+          {% if tile.caption %}<span class="r-cap">{{ tile.caption }}</span>{% endif %}
+          {% if tile.who %}<span class="by">— {{ tile.who }}</span>{% endif %}
+        </figcaption>
+        {% endif %}
+      </figure>
+    {% else %}
+      <article class="r-tile r-wish wbg-{{ loop.index0 % 3 }} fade-in">
+        <p class="r-wish-text">“{{ tile.message }}”</p>
+        <span class="r-wish-by">— {{ tile.who }}</span>
+      </article>
+    {% endif %}
+  {% endfor %}
+</section>
+
+{% if not tiles %}
+<p class="empty">The album is ready and waiting for its first memories.</p>
+{% endif %}
+
+{% else %}
+{# ---- BEFORE THE WEDDING: invite contributions (kept private until reveal) ---- #}
 <section class="cards cards-two">
   <a class="nav-card" href="{{ url_for('photos') }}">
     <span class="card-icon">❀</span>
-    <h2>Photos</h2>
-    <p>Share a favourite memory with Tony &amp; Kate.</p>
-    <span class="card-go">Open the album →</span>
+    <h2>Add Photos</h2>
+    <p>Add your favourite moments with Kate &amp; Tony.</p>
+    <span class="card-go">Add a photo →</span>
   </a>
   <a class="nav-card" href="{{ url_for('wishes') }}">
     <span class="card-icon">✎</span>
-    <h2>Wishes</h2>
-    <p>Leave a note for the happy couple to keep forever.</p>
+    <h2>Leave a Wish</h2>
+    <p>Write a note for the happy couple to keep forever.</p>
     <span class="card-go">Write a wish →</span>
   </a>
 </section>
 
 <section class="keepsake-note">
   <p>
-    Every photo and wish shared here will be gathered into a beautiful
-    keepsake e-book and sent to Tony &amp; Kate about a month after the wedding —
-    so there's time for every last memory to find its way in.
+    Add your photos and well wishes — they stay hidden away except to you until
+    the wedding day, when everyone's are revealed together right here for
+    Kate &amp; Tony to enjoy.
   </p>
 </section>
 
 <section class="live-count">
   <p>
-    <strong>{{ counts.photos }}</strong> photo{{ '' if counts.photos == 1 else 's' }} shared
-    <span class="sep">·</span>
-    <strong>{{ counts.wishes }}</strong> wish{{ '' if counts.wishes == 1 else 'es' }} left
+    <strong>{{ counts.photos }}</strong> photo{{ '' if counts.photos == 1 else 's' }}
+    and
+    <strong>{{ counts.wishes }}</strong> wish{{ '' if counts.wishes == 1 else 'es' }}
+    gathered so far
   </p>
 </section>
+{% endif %}
 {% endblock %}

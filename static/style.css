@@ -1,5 +1,5 @@
 /* ===========================================================================
-   Tony & Kate — destination wedding aesthetic
+   Kate & Tony — destination wedding aesthetic
    Warm sandy / ivory tones with soft teal & aqua ocean accents.
    =========================================================================== */
 :root {
@@ -21,6 +21,11 @@
 
 * { box-sizing: border-box; }
 
+/* Make the HTML hidden attribute always win, even over explicit display rules
+   (e.g. .countdown/.countdown-festive set display:flex). The countdown JS toggles
+   `hidden` to swap between the timer, the festive splash, and the married line. */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -40,11 +45,17 @@ h1, h2, h3 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 500
 
 a { color: var(--teal-deep); text-decoration: none; }
 
-/* --- Header --------------------------------------------------------------- */
+/* --- Header (sticky) ------------------------------------------------------- */
 .site-header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(255, 250, 243, .88);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--sand-deep);
+}
+.header-inner {
   display: flex; align-items: center; justify-content: space-between;
   flex-wrap: wrap; gap: 12px;
-  padding: 22px clamp(18px, 5vw, 56px);
+  padding: 15px clamp(18px, 5vw, 56px);
   max-width: 1180px; margin: 0 auto;
 }
 .brand {
@@ -70,8 +81,8 @@ a { color: var(--teal-deep); text-decoration: none; }
 /* --- Hero ----------------------------------------------------------------- */
 .hero {
   position: relative; text-align: center;
-  padding: clamp(40px, 9vw, 96px) 16px clamp(70px, 11vw, 120px);
-  margin-bottom: 56px;
+  padding: clamp(28px, 6vw, 64px) 16px 0;
+  margin-bottom: 0;
 }
 .hero-eyebrow {
   text-transform: uppercase; letter-spacing: .34em; font-size: .72rem;
@@ -88,19 +99,21 @@ a { color: var(--teal-deep); text-decoration: none; }
 }
 .hero-date .dot { color: var(--aqua); padding: 0 8px; }
 
-.hero-wave {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 70px;
-  background:
-    radial-gradient(60px 40px at 20% 0, transparent 60%, var(--aqua-soft) 61%),
-    radial-gradient(60px 40px at 60% 0, transparent 60%, var(--aqua-soft) 61%),
-    radial-gradient(60px 40px at 100% 0, transparent 60%, var(--aqua-soft) 61%);
-  opacity: .5; pointer-events: none;
+/* Standalone divider between the countdown and the cards. The box is filled
+   uniformly top-to-bottom, so its matched top/bottom margins give equal visible
+   gaps (hero has no bottom padding; cards have no top margin). ~3x the old wave. */
+.hero-divider {
+  height: 24px; width: 100%; margin: clamp(22px, 4vw, 32px) auto;
+  border-radius: 999px;
+  background: var(--aqua-soft); opacity: .8; pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 20%, #000 80%, transparent 100%);
 }
 
 /* --- Countdown ------------------------------------------------------------ */
 .countdown {
-  display: inline-flex; gap: clamp(10px, 3vw, 26px);
-  margin: 38px auto 0; padding: 22px clamp(18px, 4vw, 38px);
+  display: inline-flex; gap: clamp(8px, 3vw, 26px);
+  margin: clamp(20px, 4vw, 30px) auto 0; padding: clamp(14px, 2.5vw, 22px) clamp(16px, 4vw, 38px);
   background: rgba(255, 250, 243, .72);
   border: 1px solid var(--sand-deep); border-radius: var(--radius);
   box-shadow: var(--shadow); backdrop-filter: blur(4px);
@@ -116,13 +129,13 @@ a { color: var(--teal-deep); text-decoration: none; }
   color: var(--ink-soft); margin-top: 8px;
 }
 .countdown-married {
-  margin: 38px auto 0; font-family: "Cormorant Garamond", serif;
+  margin: clamp(20px, 4vw, 30px) auto 0; font-family: "Cormorant Garamond", serif;
   font-size: clamp(1.5rem, 5vw, 2.4rem); color: var(--teal-deep);
 }
 .countdown-married strong { color: var(--gold); font-weight: 600; }
 
 /* Festive splash shown on the wedding date itself */
-.countdown-festive { margin: 34px auto 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.countdown-festive { margin: clamp(18px, 4vw, 28px) auto 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .festive-burst { font-size: clamp(1.8rem, 6vw, 2.8rem); letter-spacing: .3em; animation: festive-pop 1.6s ease-in-out infinite; }
 .festive-headline {
   font-family: "Cormorant Garamond", serif; font-weight: 600;
@@ -144,7 +157,7 @@ a { color: var(--teal-deep); text-decoration: none; }
 
 /* --- Nav cards ------------------------------------------------------------ */
 .cards {
-  display: grid; gap: 22px; margin: 0 auto 48px;
+  display: grid; gap: 18px; margin: 0 auto clamp(18px, 3vw, 26px);
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 .nav-card {
@@ -166,11 +179,37 @@ a { color: var(--teal-deep); text-decoration: none; }
 .cards-two { max-width: 760px; margin-left: auto; margin-right: auto; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 
 /* --- Keepsake note on home ------------------------------------------------ */
-.keepsake-note { text-align: center; max-width: 640px; margin: 0 auto 40px; }
+.keepsake-note { text-align: center; max-width: 640px; margin: 0 auto clamp(14px, 2.5vw, 22px); }
 .keepsake-note p {
   font-family: "Cormorant Garamond", serif; font-size: 1.35rem; line-height: 1.5;
   color: var(--teal-deep); margin: 0; font-style: italic;
 }
+
+/* --- Private (pre-reveal) note -------------------------------------------- */
+.private-note {
+  max-width: 680px; margin: 0 auto 24px; text-align: center;
+  background: var(--aqua-soft); border: 1px solid var(--sand-deep);
+  border-radius: 12px; padding: 12px 18px; color: var(--teal-deep); font-size: .95rem;
+}
+.private-note p { margin: 0; }
+
+/* --- The reveal: home-page masonry of photos + wishes --------------------- */
+.reveal-intro { text-align: center; margin: 4px auto 28px; max-width: 720px; padding: 0 18px; }
+.reveal-title { font-family: "Cormorant Garamond", serif; font-size: clamp(2rem, 6vw, 3rem); color: var(--ink); margin: 0 0 6px; }
+.reveal-sub { color: var(--ink-soft); font-size: 1.08rem; margin: 0; }
+.reveal-masonry { columns: 4 240px; column-gap: 18px; max-width: 1240px; margin: 0 auto; padding: 0 18px 48px; }
+.r-tile { break-inside: avoid; margin: 0 0 18px; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.r-photo { background: #fff; }
+.r-photo img { width: 100%; display: block; }
+.r-photo figcaption { padding: 10px 14px 12px; display: flex; flex-direction: column; gap: 2px; }
+.r-photo .r-cap { font-size: .95rem; color: var(--ink); }
+.r-photo .by { font-size: .82rem; color: var(--ink-soft); }
+.r-wish { padding: 20px 20px 18px; display: flex; flex-direction: column; gap: 10px; border: 1px solid var(--sand-deep); }
+.r-wish-text { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 1.28rem; line-height: 1.4; color: var(--ink); margin: 0; }
+.r-wish-by { font-weight: 600; color: var(--teal-deep); font-size: .9rem; }
+.wbg-0 { background: var(--cream); }
+.wbg-1 { background: var(--aqua-soft); }
+.wbg-2 { background: var(--sand); }
 
 /* --- Live count ----------------------------------------------------------- */
 .live-count { text-align: center; margin: 8px 0 12px; }
@@ -273,24 +312,14 @@ textarea { resize: vertical; }
 }
 .vault-label { color: var(--ink-soft); letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; }
 
-.empty { text-align: center; color: var(--ink-soft); padding: 40px 0; font-style: italic; grid-column: 1 / -1; }
+/* Empty-state lives inside multi-column (.masonry/.wish-wall) and grid (.admin-grid)
+   containers. column-span:all keeps the paragraph on one line instead of being
+   split down the columns; grid-column:1/-1 does the equivalent in the grids. */
+.empty { text-align: center; color: var(--ink-soft); padding: 40px 0; font-style: italic; grid-column: 1 / -1; column-span: all; break-inside: avoid; }
 
-/* --- Fade-in --------------------------------------------------------------
-   The resting state is visible. The entrance is a self-completing CSS
-   animation, so a photo or a wish can never be stranded at opacity 0 by a
-   script that failed, a scroll that never happened, or an observer that never
-   fired — if the animation doesn't run at all, the content is simply there. */
-.fade-in {
-  opacity: 1; transform: none;
-  animation: fade-in-rise .7s ease both;
-}
-@keyframes fade-in-rise {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: none; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .fade-in { animation: none; }
-}
+/* --- Fade-in -------------------------------------------------------------- */
+.fade-in { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
+.fade-in.visible { opacity: 1; transform: none; }
 
 /* --- Footer --------------------------------------------------------------- */
 .site-footer {
@@ -354,6 +383,29 @@ textarea { resize: vertical; }
 .btn-soft { background: #fff; color: var(--teal-deep); border: 1px solid var(--sand-deep); }
 .btn-soft:hover { background: var(--aqua-soft); }
 .btn-soft:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.mini.neutral { background: #fff; color: var(--teal-deep); border: 1px solid var(--sand-deep); }
+.admin-card.is-hidden, .admin-row.is-hidden { opacity: .5; }
+
+/* Cloudinary usage readout (admin Photos tab) */
+.cloud-usage {
+  background: var(--cream); border: 1px solid var(--sand-deep); border-radius: 14px;
+  padding: 16px 20px; margin: 0 0 24px; box-shadow: var(--shadow-sm); color: var(--ink-soft);
+}
+.cu-top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.cu-label { font-weight: 600; color: var(--ink); }
+.cu-pct { font-size: .9rem; font-weight: 600; }
+.cu-pct.green { color: var(--teal-deep); }
+.cu-pct.amber { color: #b9770e; }
+.cu-pct.red { color: #b3261e; }
+.cu-bar { height: 10px; border-radius: 999px; background: var(--sand-deep); overflow: hidden; margin: 10px 0 8px; }
+.cu-fill { display: block; height: 100%; border-radius: 999px; transition: width .4s ease; }
+.cu-fill.green { background: var(--teal); }
+.cu-fill.amber { background: #e0a72e; }
+.cu-fill.red { background: #d4453b; }
+.cu-meta { font-size: .85rem; color: var(--ink-soft); }
+
+/* Wall preview inside the admin panel reuses the public reveal-masonry styles */
+.wall-preview { margin-top: 6px; padding-left: 0; padding-right: 0; }
 
 .admin-list { display: flex; flex-direction: column; gap: 14px; }
 .admin-row {
@@ -381,11 +433,50 @@ textarea { resize: vertical; }
 .mini.danger   { background: #fff; color: #b1502a; border-color: #e7c2ab; }
 .mini.danger:hover { background: #fbeee6; }
 
+/* --- Bulk select (admin photos + wishes) --------------------------------- */
+.admin-card { position: relative; }
+.admin-card .sel {
+  position: absolute; top: 10px; left: 10px; z-index: 2;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: rgba(255, 255, 255, .92); border: 1px solid var(--sand-deep);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: var(--shadow-sm);
+}
+.admin-row .sel { display: flex; align-items: center; padding-top: 2px; cursor: pointer; }
+.sel-box { width: 18px; height: 18px; accent-color: var(--teal); cursor: pointer; margin: 0; }
+.admin-card.selected, .admin-row.selected {
+  outline: 2px solid var(--teal); outline-offset: -2px;
+  box-shadow: 0 0 0 4px var(--aqua-soft);
+}
+
+/* Sticky action bar — appears only when something is selected */
+.bulk-bar {
+  position: sticky; bottom: 16px; z-index: 5; margin-top: 26px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  background: var(--cream); border: 1px solid var(--sand-deep); border-radius: 999px;
+  padding: 10px 16px; box-shadow: var(--shadow-md, 0 8px 28px rgba(0, 0, 0, .14));
+}
+.bulk-count { font-weight: 600; color: var(--ink); margin-right: 2px; }
+.bulk-spacer { flex: 1 1 auto; }
+
 /* --- Responsive ----------------------------------------------------------- */
 @media (max-width: 620px) {
   .field-row { grid-template-columns: 1fr; }
   .radio-row { grid-template-columns: 1fr; }
   .masonry { columns: 2 150px; }
   .wish-wall { columns: 1; }
-  .site-header { justify-content: center; text-align: center; }
+  .header-inner { justify-content: center; text-align: center; }
+
+  /* Tidy, condensed hero stack on phones */
+  .hero { padding: 22px 12px 0; margin-bottom: 0; }
+  .hero-eyebrow { letter-spacing: .2em; margin-bottom: 10px; }
+  .hero-names { font-size: 13.5vw; }
+  .hero-date { margin-top: 10px; }
+  .countdown { display: flex; width: 100%; max-width: 340px; gap: 4px; padding: 14px 8px; margin: 18px auto 0; }
+  .cd-unit { min-width: 0; flex: 1 1 0; }
+  .cd-num { font-size: 1.8rem; }
+  .cd-label { font-size: .52rem; letter-spacing: .04em; margin-top: 6px; }
+  .cards { gap: 12px; margin-bottom: 16px; }
+  .nav-card { padding: 22px 20px; }
+  .keepsake-note p { font-size: 1.2rem; }
 }
