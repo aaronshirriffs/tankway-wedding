@@ -23,6 +23,19 @@
     };
     const pad = (n) => String(n).padStart(2, "0");
 
+    // `tick` runs once synchronously below, before the interval exists, and the
+    // post-wedding branches stop the clock — so the handle has to be declared
+    // (and stopping has to be safe) before that first call.
+    let timer = null;
+    let finished = false;
+    function stopClock() {
+      finished = true;
+      if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
     function tick() {
       const now = Date.now();
 
@@ -35,7 +48,7 @@
           '<span class="festive-headline">Today’s the day!</span>' +
           '<span class="festive-sub">Kate &amp; Tony are getting married in Fiji</span>';
         festive.hidden = false;
-        clearInterval(timer);
+        stopClock();
         return;
       }
 
@@ -48,7 +61,7 @@
           'Married in Fiji <strong>·</strong> ' +
           daysMarried + ' day' + (daysMarried === 1 ? '' : 's') + ' of happily ever after';
         married.hidden = false;
-        clearInterval(timer);
+        stopClock();
         return;
       }
 
@@ -64,30 +77,15 @@
       nums.seconds.textContent = pad(s);
     }
     tick();
-    const timer = setInterval(tick, 1000);
+    if (!finished) timer = setInterval(tick, 1000);
   }
 
-  /* --- Fade-in on scroll -------------------------------------------------- */
-  function initFadeIn() {
-    const items = document.querySelectorAll(".fade-in");
-    if (!items.length) return;
-    if (!("IntersectionObserver" in window)) {
-      items.forEach((el) => el.classList.add("visible"));
-      return;
-    }
-    const obs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("visible");
-            obs.unobserve(e.target);
-          }
-        });
-      },
-      { threshold: 0.12 }
-    );
-    items.forEach((el) => obs.observe(el));
-  }
+  /* --- Fade-in ------------------------------------------------------------
+     Nothing to do here any more. `.fade-in` runs a self-completing CSS
+     animation whose end state is the element's normal, visible state, so the
+     reveal is never left hidden by a script that didn't run. Deliberately no
+     scroll handler and no IntersectionObserver: neither may ever again decide
+     whether the album and wishes are readable. */
 
   function showMsg(el, text, ok) {
     el.textContent = text;
@@ -133,7 +131,6 @@
             cap +
             '<span class="by">— ' + escapeHtml(data.photo.name) + "</span>";
           wall.prepend(fig);
-          requestAnimationFrame(() => fig.classList.add("visible"));
         }
         if (data.ok) form.reset();
       } catch (_) {
@@ -174,7 +171,6 @@
             '</span><span class="wish-time">' + escapeHtml(data.wish.timeago) +
             "</span></div>";
           wall.prepend(card);
-          requestAnimationFrame(() => card.classList.add("visible"));
           form.reset();
         }
       } catch (_) {
@@ -419,11 +415,16 @@
 
   /* --- Boot --------------------------------------------------------------- */
   document.addEventListener("DOMContentLoaded", function () {
-    initCountdown();
-    initFadeIn();
-    initPhotoForm();
-    initWishForm();
-    initVaultForm();
-    initAdmin();
+    // Run each section independently — a throw in one must not abort the ones
+    // after it, which is how a countdown bug once took the whole reveal down.
+    [initCountdown, initPhotoForm, initWishForm, initVaultForm, initAdmin].forEach(
+      function (init) {
+        try {
+          init();
+        } catch (err) {
+          console.error("Init failed: " + init.name, err);
+        }
+      }
+    );
   });
 })();

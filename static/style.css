@@ -318,8 +318,21 @@ textarea { resize: vertical; }
 .empty { text-align: center; color: var(--ink-soft); padding: 40px 0; font-style: italic; grid-column: 1 / -1; column-span: all; break-inside: avoid; }
 
 /* --- Fade-in -------------------------------------------------------------- */
-.fade-in { opacity: 0; transform: translateY(16px); transition: opacity .7s ease, transform .7s ease; }
-.fade-in.visible { opacity: 1; transform: none; }
+/* The resting state is visible. The entrance is a self-completing CSS
+   animation, so a photo or a wish can never be stranded at opacity 0 by a
+   script that failed, a scroll that never happened, or an observer that never
+   fired — if the animation doesn't run at all, the content is simply there. */
+.fade-in {
+  opacity: 1; transform: none;
+  animation: fade-in-rise .7s ease both;
+}
+@keyframes fade-in-rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fade-in { animation: none; }
+}
 
 /* --- Footer --------------------------------------------------------------- */
 .site-footer {
